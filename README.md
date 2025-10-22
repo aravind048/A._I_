@@ -1,2 +1,2 @@
-# A._I_
-AI / ML projects
+# AI-ML
+AI / ML, OPENAI, GOOGLE MAPS API, PYTHON
