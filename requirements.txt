@@ -1,6 +1,0 @@
-websocket-client
-pyaudio
-requests
-asyncio
-python-dotenv
-pyttsx3
