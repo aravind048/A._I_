@@ -1,2 +1,1 @@
-# A._I_
-AI / ML projects
+Streamlit UI
