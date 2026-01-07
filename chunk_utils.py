@@ -1,7 +1,7 @@
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-def load_and_split(file_path):
+def load_and_split(file_path:str):
     loader = PyPDFLoader(file_path)
     docs = loader.load()
 
