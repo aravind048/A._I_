@@ -1,0 +1,19 @@
+[project]
+name = "corep-assistant"
+version = "0.1.0"
+description = "LLM-assisted PRA COREP reporting assistant (prototype)"
+requires-python = ">=3.10"
+dependencies = [
+  "pydantic>=2.6",                       # schema enforcement
+  "python-dotenv>=1.0",
+  "rich>=13.7",                          # great CLI UX for demos
+  "typer>=0.12",                         # great CLI UX for demos
+  "numpy>=1.26",
+  "sentence-transformers>=2.7",          # local RAG
+  "faiss-cpu>=1.8.0",                    # local RAG vector store
+  "requests>=2.32",
+
+]
+
+[project.scripts]
+corep = "corep_assistant.cli.main:app"

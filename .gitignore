@@ -205,3 +205,201 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+# ============================================================
+# Python (general)
+# ============================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Ruff
+.ruff_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyPI configuration file
+.pypirc
+
+# Environments
+.env
+.env.example
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PDM
+.pdm-python
+.pdm-build/
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
+# Cursor
+.cursorignore
+.cursorindexingignore
+
+# Abstra
+.abstra/
+
+# ============================================================
+# PROJECT SPECIFIC: COREP Reporting Assistant
+# ============================================================
+
+# --- Data and index artifacts (generated) ---
+data/processed/
+data/index/
+data/**/*.jsonl
+data/**/*.csv
+
+# Keep raw inputs tracked (so reviewers can run the demo)
+!data/raw/
+!data/raw/**
+
+# --- Run bundles created by `corep run` ---
+runs/
+# If you want to keep a sample run bundle in git, do:
+# !runs/sample/
+# !runs/sample/**
+
+# --- Logs ---
+logs/
+*.log
+
+# --- Local secrets / keys ---
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# --- HuggingFace / SentenceTransformers caches (large, machine-specific) ---
+# Common HF cache locations
+.hf_cache/
+.cache/
+.cache/huggingface/
+.cache/torch/
+.cache/sentence_transformers/
+
+# Windows HF cache path (sometimes ends up under user profile; not always in repo)
+# (Kept here as documentation; repo-relative ignores won't catch outside paths)
+
+# --- Model artifacts (if you download/fine-tune locally) ---
+models/
+checkpoints/
+*.bin
+*.pt
+*.pth
+*.safetensors
+*.onnx
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- IDE (optional; uncomment if you want repo clean) ---
+# .vscode/
+# .idea/
