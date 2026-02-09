@@ -144,7 +144,7 @@ TOP_K=5
 
 # LLM (only required for HF_ROUTER)
 HF_API_KEY=your_key_here
-HF_MODEL=HuggingFaceH4/zephyr-7b-beta:featherless-ai
+HF_MODEL=HuggingFaceH4/all-mpnet-base-v2
 LLM_TEMPERATURE=0.1
 LLM_MAX_TOKENS=900
 LLM_RETRIES=2
