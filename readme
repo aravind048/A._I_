@@ -1,3 +1,7 @@
 uvicorn main:app --reload
 
 run above line to start
+create data/temp.pdf
+       .env file for hf tokens
+
+rag_pipeline.py and script.py are irrelevant to this application
