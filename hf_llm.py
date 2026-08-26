@@ -1,45 +1,51 @@
-from huggingface_hub import InferenceClient
-from langchain_core.runnables import RunnableLambda
-import os
-from langchain_core.prompt_values import ChatPromptValue
 import logging
+import os
+
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
+from langchain_core.prompt_values import ChatPromptValue
+from langchain_core.runnables import RunnableLambda
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Check if HF_TOKEN is set
-hf_token = os.getenv("HF_TOKEN")
-if not hf_token:
-    logger.warning("HF_TOKEN environment variable is not set. API calls will fail.")
+HF_TOKEN = os.getenv("HF_TOKEN")
+HF_MODEL = os.getenv("HF_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+
+if not HF_TOKEN:
+    logger.warning("HF_TOKEN environment variable is not set. Hugging Face API calls will fail.")
 
 client = InferenceClient(
-    model="HuggingFaceH4/zephyr-7b-beta",
-    token=hf_token
+    model=HF_MODEL,
+    token=HF_TOKEN,
 )
 
 
 def hf_generate(prompt) -> str:
-    import logging
-    logger = logging.getLogger(__name__)
+    """Generate a response using the configured Hugging Face chat model.
 
-    # 🔑 CRITICAL FIX: unwrap LangChain object
+    Input:
+        prompt: str or LangChain ChatPromptValue
+
+    Output:
+        Generated response as a string
+    """
     if isinstance(prompt, ChatPromptValue):
         prompt = prompt.to_string()
-    
-    messages = [
-        {"role": "user", "content": prompt}
-    ]
+
+    messages = [{"role": "user", "content": prompt}]
 
     try:
-        logger.debug(f"Calling HF API with prompt: {prompt[:100]}...")
+        logger.info("Calling Hugging Face model: %s", HF_MODEL)
         response = client.chat.completions.create(
             messages=messages,
-            max_tokens=512,
-            temperature=0.7
+            max_tokens=700,
+            temperature=0.2,
         )
-        logger.debug(f"HF API response: {response}")
         return response.choices[0].message.content
-    except Exception as e:
-        logger.error(f"HF API error: {str(e)}", exc_info=True)
+    except Exception:
+        logger.exception("Hugging Face API request failed")
         raise
 
 
