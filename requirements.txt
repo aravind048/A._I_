@@ -4,6 +4,13 @@ huggingface-hub==0.16.4
 torch==2.2.2
 faiss-cpu
 langchain
+langchain-community
+langchain-core
+langchain-text-splitters
 fastapi
 uvicorn
+python-multipart
 pypdf
+python-dotenv
+streamlit
+requests
