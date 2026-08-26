@@ -6,7 +6,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from knowledge_base import KnowledgeBase
-from rag_pipeline import build_research_chain
+from rag_pipeline import research_with_sources
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ async def upload_document(file: UploadFile = File(...)):
 
 @app.post("/research/")
 async def research(request: ResearchRequest):
-    """Answer a research question from the persistent knowledge base."""
+    """Answer a research question and return the evidence sources used."""
     question = request.question.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
@@ -54,9 +54,12 @@ async def research(request: ResearchRequest):
         raise HTTPException(status_code=404, detail="No documents have been indexed yet.")
 
     try:
-        chain = build_research_chain(vectorstore)
-        answer = chain.invoke(question)
-        return {"question": question, "answer": answer}
+        result = research_with_sources(vectorstore, question)
+        return {
+            "question": question,
+            "answer": result["answer"],
+            "sources": result["sources"],
+        }
     except Exception as exc:
         logger.exception("Research request failed")
         raise HTTPException(status_code=500, detail="Research request failed.") from exc
