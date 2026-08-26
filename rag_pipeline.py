@@ -2,61 +2,93 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+
+from config import TOP_K
 from hf_llm import hf_llm
 
 
-def build_rag_chain(documents):
-    """
-    Builds a Retrieval-Augmented Generation (RAG) chain
-    using FAISS + HuggingFace LLM (LangChain 1.2.0 compatible)
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
+
+def build_vectorstore(documents):
+    """Create a FAISS vector store from document chunks.
 
     Input:
-        documents: List[Document]
+        documents: List of LangChain Document objects.
+
     Output:
-        Runnable chain (invoke with a string question)
+        FAISS vector store preserving each document's metadata.
     """
+    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+    return FAISS.from_documents(documents, embeddings)
 
-    # Use local embeddings from sentence-transformers
-    # 1. Embeddings
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
 
-    # 2. Vector store
-    vectorstore = FAISS.from_documents(documents, embeddings)
+def _format_context(documents) -> str:
+    """Format retrieved documents with source information for the LLM."""
+    formatted = []
 
-    # 3. Retriever
-    retriever = vectorstore.as_retriever(
-        search_type="similarity", search_kwargs={"k": 3})
+    for document in documents:
+        source = document.metadata.get("source_file", "Unknown source")
+        page = document.metadata.get("page")
+        chunk_id = document.metadata.get("chunk_id", "Unknown")
 
-    # 4. Prompt
+        page_text = f", page {page + 1}" if isinstance(page, int) else ""
+        formatted.append(
+            f"[Source: {source}{page_text}, chunk {chunk_id}]\n"
+            f"{document.page_content}"
+        )
+
+    return "\n\n---\n\n".join(formatted)
+
+
+def _retrieve(vectorstore, question: str):
+    return vectorstore.similarity_search(question, k=TOP_K)
+
+
+def build_rag_chain(documents):
+    """Build a grounded RAG chain.
+
+    Input:
+        documents: List of LangChain Document objects.
+
+    Output:
+        Runnable chain accepting a question and returning a grounded answer.
+    """
+    vectorstore = build_vectorstore(documents)
+    retriever = RunnableLambda(lambda question: _retrieve(vectorstore, question))
+
     prompt = ChatPromptTemplate.from_template(
-        """You are a factual question-answering assistant.
+        """You are an enterprise research assistant.
 
-            Answer the question using ONLY the provided context.
-            Follow these rules strictly:
-            - If the question asks for a specific fact, give ONLY that fact.
-            - Do NOT add extra explanation.
-            - Do NOT infer beyond the context.
-            - If the answer is not explicitly present, say: "Not found in document."
+Answer the user's question using ONLY the supplied evidence.
 
-            Context:
-            {context}
+Rules:
+- Do not invent facts.
+- Do not use knowledge that is not present in the evidence.
+- If the evidence is insufficient, say: "I could not find enough information in the provided sources to answer this confidently."
+- Give a concise, useful research answer.
+- When making a recommendation, explain the key evidence supporting it.
+- Preserve the source labels included in the evidence.
 
-            Question:
-            {question}
-        """
+Evidence:
+{context}
+
+Question:
+{question}
+"""
     )
 
-    # 7. Chain (THIS replaces RetrievalQA)
-    rag_chain = (
-        {
-            "context": retriever,
-            "question": RunnablePassthrough()
+    def prepare_input(question: str):
+        documents = retriever.invoke(question)
+        return {
+            "context": _format_context(documents),
+            "question": question,
         }
+
+    return (
+        RunnableLambda(prepare_input)
         | prompt
         | hf_llm
+        | StrOutputParser()
     )
-
-    return rag_chain
