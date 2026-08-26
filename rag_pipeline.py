@@ -1,13 +1,35 @@
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
 
 from config import TOP_K
 from hf_llm import hf_llm
 
 
+RESEARCH_PROMPT = ChatPromptTemplate.from_template(
+    """You are an enterprise research assistant.
+
+Answer the user's question using ONLY the supplied evidence.
+
+Rules:
+- Do not invent facts.
+- Do not use knowledge that is not present in the evidence.
+- If the evidence is insufficient, say: "I could not find enough information in the provided sources to answer this confidently."
+- Give a concise, useful research answer.
+- When making a recommendation, explain the key evidence supporting it.
+- Do not cite sources that are not present in the supplied evidence.
+
+Evidence:
+{context}
+
+Question:
+{question}
+"""
+)
+
+
 def _prepare_documents(vectorstore, question: str):
-    """Retrieve evidence and return both context text and source metadata."""
+    """Retrieve evidence and return context text plus source metadata."""
     documents = vectorstore.similarity_search(question, k=TOP_K)
     context_parts = []
     sources = []
@@ -39,54 +61,29 @@ def _prepare_documents(vectorstore, question: str):
 
 
 def build_research_chain(vectorstore):
-    """Build a research chain that returns an answer and its evidence sources."""
-    prompt = ChatPromptTemplate.from_template(
-        """You are an enterprise research assistant.
-
-Answer the user's question using ONLY the supplied evidence.
-
-Rules:
-- Do not invent facts.
-- Do not use knowledge that is not present in the evidence.
-- If the evidence is insufficient, say: "I could not find enough information in the provided sources to answer this confidently."
-- Give a concise, useful research answer.
-- When making a recommendation, explain the key evidence supporting it.
-- Do not cite sources that are not present in the supplied evidence.
-
-Evidence:
-{context}
-
-Question:
-{question}
-"""
-    )
+    """Build a reusable retrieval + generation chain."""
+    def prepare_input(question: str):
+        return _prepare_documents(vectorstore, question)
 
     return (
-        RunnableLambda(lambda question: _prepare_documents(vectorstore, question))
-        | prompt
+        RunnableLambda(prepare_input)
+        | RESEARCH_PROMPT
         | hf_llm
         | StrOutputParser()
     )
 
 
 def research_with_sources(vectorstore, question: str):
-    """Run retrieval + generation and return answer with retrieved sources.
-
-    Input:
-        vectorstore: Loaded FAISS vector store.
-        question: User's research question.
-
-    Output:
-        Dictionary containing the generated answer and source metadata.
-    """
+    """Run retrieval + generation and return answer with source metadata."""
     prepared = _prepare_documents(vectorstore, question)
-    answer = (prompt_chain := (
-        prompt
+
+    answer = (
+        RESEARCH_PROMPT
         | hf_llm
         | StrOutputParser()
-    )).invoke({
+    ).invoke({
         "context": prepared["context"],
-        "question": question,
+        "question": prepared["question"],
     })
 
     return {
