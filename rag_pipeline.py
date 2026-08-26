@@ -1,27 +1,9 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.runnables import RunnableLambda
 
 from config import TOP_K
 from hf_llm import hf_llm
-
-
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-
-
-def build_vectorstore(documents):
-    """Create a FAISS vector store from document chunks.
-
-    Input:
-        documents: List of LangChain Document objects.
-
-    Output:
-        FAISS vector store preserving each document's metadata.
-    """
-    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-    return FAISS.from_documents(documents, embeddings)
 
 
 def _format_context(documents) -> str:
@@ -42,22 +24,15 @@ def _format_context(documents) -> str:
     return "\n\n---\n\n".join(formatted)
 
 
-def _retrieve(vectorstore, question: str):
-    return vectorstore.similarity_search(question, k=TOP_K)
-
-
-def build_rag_chain(documents):
-    """Build a grounded RAG chain.
+def build_research_chain(vectorstore):
+    """Build a research chain using an existing persistent vector store.
 
     Input:
-        documents: List of LangChain Document objects.
+        vectorstore: Loaded FAISS vector store.
 
     Output:
-        Runnable chain accepting a question and returning a grounded answer.
+        Runnable chain accepting a research question and returning an answer.
     """
-    vectorstore = build_vectorstore(documents)
-    retriever = RunnableLambda(lambda question: _retrieve(vectorstore, question))
-
     prompt = ChatPromptTemplate.from_template(
         """You are an enterprise research assistant.
 
@@ -80,7 +55,7 @@ Question:
     )
 
     def prepare_input(question: str):
-        documents = retriever.invoke(question)
+        documents = vectorstore.similarity_search(question, k=TOP_K)
         return {
             "context": _format_context(documents),
             "question": question,
