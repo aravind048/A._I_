@@ -12,17 +12,15 @@ RESEARCH_PROMPT = ChatPromptTemplate.from_template(
 Answer the user's question using ONLY the supplied evidence.
 
 Rules:
-- Do not invent facts.
-- Do not use knowledge that is not present in the evidence.
+- Do not invent facts or use knowledge outside the supplied evidence.
 - Preserve the terminology and meaning used in the evidence.
-- Do not infer a category from a nearby list heading alone.
-- For classification questions, distinguish between programming languages, frameworks, libraries, APIs, platforms, databases, tools, and models.
-- If the user asks specifically for programming languages, return only actual programming languages supported by the evidence. Do not classify frameworks, libraries, databases, APIs, or platforms as programming languages. For example, Flask is a Python web framework, not a programming language; MySQL is a database system, not a programming language.
-- If the evidence lists technologies without enough information to classify them confidently, state the ambiguity instead of guessing.
+- Do not infer information from a document's format, title, or section heading alone.
 - If the evidence is insufficient, say: "I could not find enough information in the provided sources to answer this confidently."
-- Give a concise, useful research answer.
-- When making a recommendation, explain the key evidence supporting it.
-- Do not cite sources that are not present in the supplied evidence.
+- For classification questions, classify items only when the evidence supports the classification. Do not force every item into the requested category.
+- Distinguish between categories such as programming languages, frameworks, libraries, APIs, platforms, databases, tools, models, methods, and concepts when the evidence provides enough information to do so.
+- If an item's category cannot be determined from the evidence, state that limitation rather than guessing.
+- Give a concise, useful answer and explain the relevant evidence when helpful.
+- Do not cite or invent sources that are not present in the supplied evidence.
 
 Evidence:
 {context}
@@ -67,11 +65,8 @@ def _prepare_documents(vectorstore, question: str):
 
 def build_research_chain(vectorstore):
     """Build a reusable retrieval + generation chain."""
-    def prepare_input(question: str):
-        return _prepare_documents(vectorstore, question)
-
     return (
-        RunnableLambda(prepare_input)
+        RunnableLambda(lambda question: _prepare_documents(vectorstore, question))
         | RESEARCH_PROMPT
         | hf_llm
         | StrOutputParser()
@@ -81,15 +76,12 @@ def build_research_chain(vectorstore):
 def research_with_sources(vectorstore, question: str):
     """Run retrieval + generation and return answer with source metadata."""
     prepared = _prepare_documents(vectorstore, question)
-
-    answer = (
-        RESEARCH_PROMPT
-        | hf_llm
-        | StrOutputParser()
-    ).invoke({
-        "context": prepared["context"],
-        "question": prepared["question"],
-    })
+    answer = (RESEARCH_PROMPT | hf_llm | StrOutputParser()).invoke(
+        {
+            "context": prepared["context"],
+            "question": prepared["question"],
+        }
+    )
 
     return {
         "answer": answer,
