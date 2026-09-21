@@ -1,49 +1,117 @@
-from sentence_transformers import SentenceTransformer
 from pathlib import Path
+
 import faiss
-from chunker import load_document, chunk_markdown
+from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer(
-    "sentence-transformers/all-MiniLM-L6-v2"
-)
-
-document_path = Path("knowledge/references.md")
-
-document = load_document(document_path)
-
-chunks = chunk_markdown(document)
+from rag.chunker import load_document, chunk_markdown
 
 
-texts = [chunk["content"] for chunk in chunks]
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+DOCUMENT_PATH = Path("knowledge/references.md")
 
-embeddings = model.encode(
-    texts,
-    convert_to_numpy=True
-)
-print(embeddings.shape)
 
-dimension = embeddings.shape[1]
+model = SentenceTransformer(MODEL_NAME)
 
-# uses Euclidean distance, smaller values indicate more similarity
-index = faiss.IndexFlatL2(dimension)
-index.add(embeddings)
 
-query = "I thought y = x creates a copy of the list."
-query_embedding = model.encode(
-    [query],
-    convert_to_numpy=True
-)
+def build_index():
 
-distances, indices = index.search(
-    query_embedding,
-    k=3
-)
+    document = load_document(DOCUMENT_PATH)
 
-for position, chunk_index in enumerate(indices[0]):
-    chunk = chunks[chunk_index]
+    chunks = chunk_markdown(document)
 
-    print(f"\nRank {position + 1}")
-    print("Chunk ID:", chunk["chunk_id"])
-    print("Title:", chunk["title"])
-    print("Type:", chunk["content_type"])
-    print("Content:", chunk["content"])
+    texts = [
+        chunk["content"]
+        for chunk in chunks
+    ]
+
+    embeddings = model.encode(
+        texts,
+        convert_to_numpy=True
+    )
+
+    dimension = embeddings.shape[1]
+
+    # Uses Euclidean distance.
+    # Smaller values indicate greater similarity.
+    index = faiss.IndexFlatL2(dimension)
+
+    index.add(embeddings)
+
+    return index, chunks
+
+
+def retrieve(query, top_k=3):
+
+    index, chunks = build_index()
+
+    query_embedding = model.encode(
+        [query],
+        convert_to_numpy=True
+    )
+
+    distances, indices = index.search(
+        query_embedding,
+        k=top_k
+    )
+
+    results = []
+
+    for position, chunk_index in enumerate(indices[0]):
+
+        chunk = chunks[chunk_index]
+
+        results.append({
+            "rank": position + 1,
+            "distance": float(distances[0][position]),
+            "chunk_id": chunk["chunk_id"],
+            "title": chunk["title"],
+            "content_type": chunk["content_type"],
+            "content": chunk["content"]
+        })
+
+    return results
+
+
+if __name__ == "__main__":
+
+    query = (
+        "Python references misconception that assigning "
+        "one variable to another creates a separate copy "
+        "of a list. Provide a worked example."
+    )
+
+    results = retrieve(query)
+
+    print("Retrieval Query:")
+    print(query)
+
+    for result in results:
+
+        print(
+            f"\nRank {result['rank']}"
+        )
+
+        print(
+            "Distance:",
+            result["distance"]
+        )
+
+        print(
+            "Chunk ID:",
+            result["chunk_id"]
+        )
+
+        print(
+            "Title:",
+            result["title"]
+        )
+
+        print(
+            "Type:",
+            result["content_type"]
+        )
+
+        print(
+            "Content:",
+            result["content"]
+        )

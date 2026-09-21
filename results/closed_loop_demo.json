@@ -1,0 +1,53 @@
+{
+    "experiment": "ACMF Closed-Loop Learning Cycle",
+    "concept": "references",
+    "error_pattern": "reference_aliasing_misunderstanding",
+    "initial_mastery": 0.35,
+    "cycles": [
+        {
+            "cycle": 1,
+            "mastery_before": 0.35,
+            "pedagogical_action": "EXPLANATION",
+            "learner_answer": "[10,20]",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.25045045045045045,
+            "error_count": 1
+        },
+        {
+            "cycle": 2,
+            "mastery_before": 0.25045045045045045,
+            "pedagogical_action": "EXPLANATION",
+            "learner_answer": "[10,20]",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.23207383905393714,
+            "error_count": 2
+        },
+        {
+            "cycle": 3,
+            "mastery_before": 0.23207383905393714,
+            "pedagogical_action": "WORKED_EXAMPLE",
+            "learner_answer": "[10,20,30]",
+            "correct": true,
+            "effectiveness": "POSITIVE_RESPONSE",
+            "mastery_after": 0.6610081010965925,
+            "error_count": 2
+        }
+    ],
+    "final_learner_state": {
+        "knowledge": {
+            "references": 0.6610081010965925
+        },
+        "error_history": {
+            "references": {
+                "reference_aliasing_misunderstanding": 2
+            }
+        },
+        "progress": {
+            "questions_attempted": 3,
+            "questions_correct": 1,
+            "last_response_correct": true
+        }
+    }
+}
