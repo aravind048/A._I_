@@ -1,23 +1,23 @@
-from pathlib import Path
-
 import faiss
+
 from sentence_transformers import SentenceTransformer
 
-from rag.chunker import load_document, chunk_markdown
+from rag.chunker import load_all_chunks
 
 
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-DOCUMENT_PATH = Path("knowledge/references.md")
+MODEL_NAME = (
+    "sentence-transformers/"
+    "all-MiniLM-L6-v2"
+)
 
-
-model = SentenceTransformer(MODEL_NAME)
+model = SentenceTransformer(
+    MODEL_NAME
+)
 
 
 def build_index():
 
-    document = load_document(DOCUMENT_PATH)
-
-    chunks = chunk_markdown(document)
+    chunks = load_all_chunks()
 
     texts = [
         chunk["content"]
@@ -31,16 +31,19 @@ def build_index():
 
     dimension = embeddings.shape[1]
 
-    # Uses Euclidean distance.
-    # Smaller values indicate greater similarity.
-    index = faiss.IndexFlatL2(dimension)
+    index = faiss.IndexFlatL2(
+        dimension
+    )
 
     index.add(embeddings)
 
     return index, chunks
 
 
-def retrieve(query, top_k=3):
+def retrieve(
+    query,
+    top_k=3
+):
 
     index, chunks = build_index()
 
@@ -56,62 +59,25 @@ def retrieve(query, top_k=3):
 
     results = []
 
-    for position, chunk_index in enumerate(indices[0]):
+    for position, chunk_index in enumerate(
+        indices[0]
+    ):
 
         chunk = chunks[chunk_index]
 
         results.append({
             "rank": position + 1,
-            "distance": float(distances[0][position]),
+            "distance": float(
+                distances[0][position]
+            ),
             "chunk_id": chunk["chunk_id"],
+            "concept": chunk["concept"],
+            "source": chunk["source"],
             "title": chunk["title"],
-            "content_type": chunk["content_type"],
+            "content_type": chunk[
+                "content_type"
+            ],
             "content": chunk["content"]
         })
 
     return results
-
-
-if __name__ == "__main__":
-
-    query = (
-        "Python references misconception that assigning "
-        "one variable to another creates a separate copy "
-        "of a list. Provide a worked example."
-    )
-
-    results = retrieve(query)
-
-    print("Retrieval Query:")
-    print(query)
-
-    for result in results:
-
-        print(
-            f"\nRank {result['rank']}"
-        )
-
-        print(
-            "Distance:",
-            result["distance"]
-        )
-
-        print(
-            "Chunk ID:",
-            result["chunk_id"]
-        )
-
-        print(
-            "Title:",
-            result["title"]
-        )
-
-        print(
-            "Type:",
-            result["content_type"]
-        )
-
-        print(
-            "Content:",
-            result["content"]
-        )

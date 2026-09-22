@@ -1,0 +1,142 @@
+{
+    "experiment": "ACMF Full Pipeline Experiment",
+    "concept": "references",
+    "error_pattern": "reference_aliasing_misunderstanding",
+    "initial_mastery": 0.35,
+    "cycles": [
+        {
+            "cycle": 1,
+            "mastery_before": 0.35,
+            "error_count_before": 0,
+            "repeated_error_before": false,
+            "previous_effectiveness": null,
+            "action": "EXPLANATION",
+            "retrieval_query": "Python references. misconception that assigning one variable to another creates a separate copy of a list. Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "REF_002",
+                    "title": "Assignment and references",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "REF_004",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "REF_001",
+                    "title": "What is a reference?",
+                    "content_type": "concept"
+                }
+            ],
+            "intervention": "Let's talk about references in Python.\n\nSo, you might have noticed that when we write:\n\nx = [1, 2, 3]\ny = x\n\nPython doesn't create a new list just because we do this. Instead, both x and y refer to the same list object.\n\nThink of it like a book. When you lend a book to a friend, you're not making a copy of the book, you're just giving your friend access to the same book you already have. They can read the same words, look at the same pictures, and even make notes in the margins.\n\nIn Python, x and y are like two friends who both have access to the same book (the list). They can both read the same words, look at the same pictures, and even make changes to the list.\n\nA common mistake is to think that y = x creates a completely independent copy of the list. But it doesn't. It just gives y a name for the same list that x already has.\n\nSo, if you change the list in one of the variables, both variables will see the change. For example:\n\nx = [1, 2, 3]\ny = x\n\nx[0] = 10\n\nprint(x)  # prints: [10, 2, 3]\nprint(y)  # prints: [10, 2, 3]\n\nAs you can see, changing the list in x also changes the list in y, because they both refer to the same list object.\n\nDoes that make sense?",
+            "learner_answer": "[10,20]",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.25045045045045045
+        },
+        {
+            "cycle": 2,
+            "mastery_before": 0.25045045045045045,
+            "error_count_before": 1,
+            "repeated_error_before": false,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python references. misconception that assigning one variable to another creates a separate copy of a list. Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "REF_002",
+                    "title": "Assignment and references",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "REF_004",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "REF_001",
+                    "title": "What is a reference?",
+                    "content_type": "concept"
+                }
+            ],
+            "intervention": "Let's talk about references in Python.\n\nSo, you might have noticed that when we assign a list to a variable and then assign that variable to another variable, both variables seem to \"remember\" the original list. But, what's really going on here?\n\nWhen we write:\n\nx = [1, 2, 3]\ny = x\n\nPython doesn't create a new list just because we assign `x` to `y`. Instead, both `x` and `y` refer to the same list object. Think of it like a bookshelf where the books are actually the list objects.\n\nIn this case, `x` and `y` are like two book titles that point to the same book on the shelf. When we change the book (i.e., modify the list), both titles point to the same updated book.\n\nThis is why if we do something like this:\n\nx = [1, 2, 3]\nx.append(4)\n\ny will also have a new list with the additional element [1, 2, 3, 4] because both `x` and `y` refer to the same list object.\n\nSo, to summarize: when you assign a list to a variable and then assign that variable to another variable, both variables refer to the same list object. They're not like two separate lists that happen to have the same elements - they're like two book titles that point to the same book on the shelf.",
+            "learner_answer": "[10,20]",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.23207383905393714
+        },
+        {
+            "cycle": 3,
+            "mastery_before": 0.23207383905393714,
+            "error_count_before": 2,
+            "repeated_error_before": true,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "WORKED_EXAMPLE",
+            "retrieval_query": "Python references. misconception that assigning one variable to another creates a separate copy of a list. Provide a worked example.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "REF_002",
+                    "title": "Assignment and references",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "REF_004",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "REF_001",
+                    "title": "What is a reference?",
+                    "content_type": "concept"
+                }
+            ],
+            "intervention": "Let's work on a simple example to clarify this concept.\n\nConsider the following code:\n\n```python\nx = [1, 2, 3]\ny = x\n```\n\nDo you think this code creates a new list, or does it create a copy of the original list?\n\nThink about what we just learned about Python variables and objects. A variable name is associated with an object, but it doesn't create a new object.\n\nNow, let's run through the code again. When we write `y = x`, we're not creating a new list. Instead, we're creating a new variable name that refers to the same list object that `x` refers to.\n\nHere's the important part: because `x` and `y` both refer to the same list object, any changes we make to `x` will also be reflected in `y`. Let's try an example:\n\n```python\nx = [1, 2, 3]\ny = x\n\nprint(x)  # [1, 2, 3]\nprint(y)  # [1, 2, 3]\n\nx.append(4)\nprint(x)  # [1, 2, 3, 4]\nprint(y)  # [1, 2, 3, 4]\n```\n\nAs you can see, when we appended a new element to `x`, the same element was also added to `y`.\n\nSo, what's the difference between creating a new list and creating a copy of an existing list? The key difference is that a new list would have its own separate object in memory, whereas a copy of an existing list shares the same object in memory.\n\nDoes that make sense?",
+            "learner_answer": "[10,20,30]",
+            "correct": true,
+            "effectiveness": "POSITIVE_RESPONSE",
+            "mastery_after": 0.6610081010965925
+        }
+    ],
+    "final_learner_state": {
+        "knowledge": {
+            "references": 0.6610081010965925
+        },
+        "error_history": {
+            "references": {
+                "reference_aliasing_misunderstanding": 2
+            }
+        },
+        "progress": {
+            "questions_attempted": 3,
+            "questions_correct": 1,
+            "last_response_correct": true
+        },
+        "intervention_history": [
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "WORKED_EXAMPLE",
+                "response_correct": true,
+                "effectiveness": "POSITIVE_RESPONSE"
+            }
+        ]
+    }
+}

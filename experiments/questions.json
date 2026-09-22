@@ -1,0 +1,76 @@
+{
+    "questions": [
+        {
+            "id": "Q001",
+            "concept": "variables",
+            "question": "x = 10\ny = x + 5\nprint(y)",
+            "expected_answer": "15"
+        },
+        {
+            "id": "Q002",
+            "concept": "variables",
+            "question": "x = 10\nx = x + 2\nprint(x)",
+            "expected_answer": "12"
+        },
+        {
+            "id": "Q003",
+            "concept": "variables",
+            "question": "x = 5\ny = 2\nprint(x * y)",
+            "expected_answer": "10"
+        },
+        {
+            "id": "Q004",
+            "concept": "conditions",
+            "question": "x = 10\nif x > 5:\n    print(\"A\")\nelse:\n    print(\"B\")",
+            "expected_answer": "A"
+        },
+        {
+            "id": "Q005",
+            "concept": "conditions",
+            "question": "x = 3\nif x > 5:\n    print(\"A\")\nelse:\n    print(\"B\")",
+            "expected_answer": "B"
+        },
+        {
+            "id": "Q006",
+            "concept": "conditions",
+            "question": "x = 10\nif x == 10:\n    print(\"Yes\")\nelse:\n    print(\"No\")",
+            "expected_answer": "Yes"
+        },
+        {
+            "id": "Q007",
+            "concept": "loops",
+            "question": "for i in range(3):\n    print(i)",
+            "expected_answer": "0\n1\n2"
+        },
+        {
+            "id": "Q008",
+            "concept": "loops",
+            "question": "total = 0\nfor i in range(1, 4):\n    total += i\nprint(total)",
+            "expected_answer": "6"
+        },
+        {
+            "id": "Q009",
+            "concept": "loops",
+            "question": "for i in range(2):\n    print(\"Hello\")",
+            "expected_answer": "Hello\nHello"
+        },
+        {
+            "id": "Q010",
+            "concept": "references",
+            "question": "x = [1, 2, 3]\ny = x\ny.append(4)\nprint(x)",
+            "expected_answer": "[1,2,3,4]"
+        },
+        {
+            "id": "Q011",
+            "concept": "references",
+            "question": "a = [10, 20]\nb = a\nb.append(30)\nprint(a)",
+            "expected_answer": "[10,20,30]"
+        },
+        {
+            "id": "Q012",
+            "concept": "references",
+            "question": "x = [1, 2]\ny = x\ny.append(3)\nprint(y)",
+            "expected_answer": "[1,2,3]"
+        }
+    ]
+}

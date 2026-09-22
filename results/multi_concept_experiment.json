@@ -1,0 +1,557 @@
+{
+    "experiment": "ACMF Multi-Concept Experiment",
+    "concepts": [
+        "variables",
+        "conditions",
+        "loops",
+        "references"
+    ],
+    "total_cycles": 12,
+    "results": [
+        {
+            "concept": "variables",
+            "cycle": 1,
+            "question_id": "Q001",
+            "mastery_before": 0.35,
+            "error_count_before": 0,
+            "repeated_error_before": false,
+            "previous_effectiveness": null,
+            "action": "EXPLANATION",
+            "retrieval_query": "Python variables. Learner issue: variables_misunderstanding. Question context: x = 10\ny = x + 5\nprint(y). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "VARIABLES_005",
+                    "concept": "variables",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "VARIABLES_003",
+                    "concept": "variables",
+                    "title": "Using multiple variables",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "VARIABLES_002",
+                    "concept": "variables",
+                    "title": "Assignment",
+                    "content_type": "concept"
+                }
+            ],
+            "learner_answer": "10",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.25045045045045045
+        },
+        {
+            "concept": "variables",
+            "cycle": 2,
+            "question_id": "Q002",
+            "mastery_before": 0.25045045045045045,
+            "error_count_before": 1,
+            "repeated_error_before": false,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python variables. Learner issue: variables_misunderstanding. Question context: x = 10\nx = x + 2\nprint(x). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "VARIABLES_002",
+                    "concept": "variables",
+                    "title": "Assignment",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "VARIABLES_004",
+                    "concept": "variables",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "VARIABLES_005",
+                    "concept": "variables",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                }
+            ],
+            "learner_answer": "10",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.23207383905393714
+        },
+        {
+            "concept": "variables",
+            "cycle": 3,
+            "question_id": "Q003",
+            "mastery_before": 0.23207383905393714,
+            "error_count_before": 2,
+            "repeated_error_before": true,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "WORKED_EXAMPLE",
+            "retrieval_query": "Python variables. Learner issue: variables_misunderstanding. Question context: x = 5\ny = 2\nprint(x * y). Provide a worked example.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "VARIABLES_003",
+                    "concept": "variables",
+                    "title": "Using multiple variables",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "VARIABLES_005",
+                    "concept": "variables",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "REFERENCES_002",
+                    "concept": "references",
+                    "title": "Assignment and references",
+                    "content_type": "concept"
+                }
+            ],
+            "learner_answer": "10",
+            "correct": true,
+            "effectiveness": "POSITIVE_RESPONSE",
+            "mastery_after": 0.6610081010965925
+        },
+        {
+            "concept": "conditions",
+            "cycle": 1,
+            "question_id": "Q004",
+            "mastery_before": 0.35,
+            "error_count_before": 0,
+            "repeated_error_before": false,
+            "previous_effectiveness": "POSITIVE_RESPONSE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python conditions. Learner issue: conditions_misunderstanding. Question context: x = 10\nif x > 5:\n    print(\"A\")\nelse:\n    print(\"B\"). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "CONDITIONS_003",
+                    "concept": "conditions",
+                    "title": "False condition",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "CONDITIONS_004",
+                    "concept": "conditions",
+                    "title": "Equality comparison",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "CONDITIONS_001",
+                    "concept": "conditions",
+                    "title": "What is a condition?",
+                    "content_type": "concept"
+                }
+            ],
+            "learner_answer": "B",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.25045045045045045
+        },
+        {
+            "concept": "conditions",
+            "cycle": 2,
+            "question_id": "Q005",
+            "mastery_before": 0.25045045045045045,
+            "error_count_before": 1,
+            "repeated_error_before": false,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python conditions. Learner issue: conditions_misunderstanding. Question context: x = 3\nif x > 5:\n    print(\"A\")\nelse:\n    print(\"B\"). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "CONDITIONS_003",
+                    "concept": "conditions",
+                    "title": "False condition",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "CONDITIONS_001",
+                    "concept": "conditions",
+                    "title": "What is a condition?",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "CONDITIONS_004",
+                    "concept": "conditions",
+                    "title": "Equality comparison",
+                    "content_type": "concept"
+                }
+            ],
+            "learner_answer": "A",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.23207383905393714
+        },
+        {
+            "concept": "conditions",
+            "cycle": 3,
+            "question_id": "Q006",
+            "mastery_before": 0.23207383905393714,
+            "error_count_before": 2,
+            "repeated_error_before": true,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "WORKED_EXAMPLE",
+            "retrieval_query": "Python conditions. Learner issue: conditions_misunderstanding. Question context: x = 10\nif x == 10:\n    print(\"Yes\")\nelse:\n    print(\"No\"). Provide a worked example.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "CONDITIONS_004",
+                    "concept": "conditions",
+                    "title": "Equality comparison",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "CONDITIONS_006",
+                    "concept": "conditions",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "CONDITIONS_003",
+                    "concept": "conditions",
+                    "title": "False condition",
+                    "content_type": "concept"
+                }
+            ],
+            "learner_answer": "Yes",
+            "correct": true,
+            "effectiveness": "POSITIVE_RESPONSE",
+            "mastery_after": 0.6610081010965925
+        },
+        {
+            "concept": "loops",
+            "cycle": 1,
+            "question_id": "Q007",
+            "mastery_before": 0.35,
+            "error_count_before": 0,
+            "repeated_error_before": false,
+            "previous_effectiveness": "POSITIVE_RESPONSE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python loops. Learner issue: loops_misunderstanding. Question context: for i in range(3):\n    print(i). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "LOOPS_006",
+                    "concept": "loops",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "LOOPS_001",
+                    "concept": "loops",
+                    "title": "What is a loop?",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "LOOPS_005",
+                    "concept": "loops",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                }
+            ],
+            "learner_answer": "1\n2\n3",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.25045045045045045
+        },
+        {
+            "concept": "loops",
+            "cycle": 2,
+            "question_id": "Q008",
+            "mastery_before": 0.25045045045045045,
+            "error_count_before": 1,
+            "repeated_error_before": false,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python loops. Learner issue: loops_misunderstanding. Question context: total = 0\nfor i in range(1, 4):\n    total += i\nprint(total). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "LOOPS_004",
+                    "concept": "loops",
+                    "title": "Accumulating values",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "LOOPS_001",
+                    "concept": "loops",
+                    "title": "What is a loop?",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "LOOPS_005",
+                    "concept": "loops",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                }
+            ],
+            "learner_answer": "1\n2\n3",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.23207383905393714
+        },
+        {
+            "concept": "loops",
+            "cycle": 3,
+            "question_id": "Q009",
+            "mastery_before": 0.23207383905393714,
+            "error_count_before": 2,
+            "repeated_error_before": true,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "WORKED_EXAMPLE",
+            "retrieval_query": "Python loops. Learner issue: loops_misunderstanding. Question context: for i in range(2):\n    print(\"Hello\"). Provide a worked example.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "LOOPS_001",
+                    "concept": "loops",
+                    "title": "What is a loop?",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "LOOPS_006",
+                    "concept": "loops",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "LOOPS_003",
+                    "concept": "loops",
+                    "title": "Repeating an action",
+                    "content_type": "concept"
+                }
+            ],
+            "learner_answer": "Hello\nHello",
+            "correct": true,
+            "effectiveness": "POSITIVE_RESPONSE",
+            "mastery_after": 0.6610081010965925
+        },
+        {
+            "concept": "references",
+            "cycle": 1,
+            "question_id": "Q010",
+            "mastery_before": 0.35,
+            "error_count_before": 0,
+            "repeated_error_before": false,
+            "previous_effectiveness": "POSITIVE_RESPONSE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python references. Learner issue: references_misunderstanding. Question context: x = [1, 2, 3]\ny = x\ny.append(4)\nprint(x). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "REFERENCES_002",
+                    "concept": "references",
+                    "title": "Assignment and references",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "REFERENCES_005",
+                    "concept": "references",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "LOOPS_005",
+                    "concept": "loops",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                }
+            ],
+            "learner_answer": "[10,20]",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.25045045045045045
+        },
+        {
+            "concept": "references",
+            "cycle": 2,
+            "question_id": "Q011",
+            "mastery_before": 0.25045045045045045,
+            "error_count_before": 1,
+            "repeated_error_before": false,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "EXPLANATION",
+            "retrieval_query": "Python references. Learner issue: references_misunderstanding. Question context: a = [10, 20]\nb = a\nb.append(30)\nprint(a). Provide an explanation.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "REFERENCES_005",
+                    "concept": "references",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "REFERENCES_002",
+                    "concept": "references",
+                    "title": "Assignment and references",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "VARIABLES_002",
+                    "concept": "variables",
+                    "title": "Assignment",
+                    "content_type": "concept"
+                }
+            ],
+            "learner_answer": "[10,20]",
+            "correct": false,
+            "effectiveness": "INEFFECTIVE",
+            "mastery_after": 0.23207383905393714
+        },
+        {
+            "concept": "references",
+            "cycle": 3,
+            "question_id": "Q012",
+            "mastery_before": 0.23207383905393714,
+            "error_count_before": 2,
+            "repeated_error_before": true,
+            "previous_effectiveness": "INEFFECTIVE",
+            "action": "WORKED_EXAMPLE",
+            "retrieval_query": "Python references. Learner issue: references_misunderstanding. Question context: x = [1, 2]\ny = x\ny.append(3)\nprint(y). Provide a worked example.",
+            "retrieved_chunks": [
+                {
+                    "rank": 1,
+                    "chunk_id": "REFERENCES_005",
+                    "concept": "references",
+                    "title": "Worked example",
+                    "content_type": "worked_example"
+                },
+                {
+                    "rank": 2,
+                    "chunk_id": "REFERENCES_002",
+                    "concept": "references",
+                    "title": "Assignment and references",
+                    "content_type": "concept"
+                },
+                {
+                    "rank": 3,
+                    "chunk_id": "LOOPS_005",
+                    "concept": "loops",
+                    "title": "Common misconception",
+                    "content_type": "misconception"
+                }
+            ],
+            "learner_answer": "[1,2,3]",
+            "correct": true,
+            "effectiveness": "POSITIVE_RESPONSE",
+            "mastery_after": 0.6610081010965925
+        }
+    ],
+    "final_learner_state": {
+        "knowledge": {
+            "variables": 0.6610081010965925,
+            "conditions": 0.6610081010965925,
+            "loops": 0.6610081010965925,
+            "references": 0.6610081010965925
+        },
+        "error_history": {
+            "variables": {
+                "variables_misunderstanding": 2
+            },
+            "conditions": {
+                "conditions_misunderstanding": 2
+            },
+            "loops": {
+                "loops_misunderstanding": 2
+            },
+            "references": {
+                "references_misunderstanding": 2
+            }
+        },
+        "progress": {
+            "questions_attempted": 12,
+            "questions_correct": 4,
+            "last_response_correct": true
+        },
+        "intervention_history": [
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "WORKED_EXAMPLE",
+                "response_correct": true,
+                "effectiveness": "POSITIVE_RESPONSE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "WORKED_EXAMPLE",
+                "response_correct": true,
+                "effectiveness": "POSITIVE_RESPONSE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "WORKED_EXAMPLE",
+                "response_correct": true,
+                "effectiveness": "POSITIVE_RESPONSE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "EXPLANATION",
+                "response_correct": false,
+                "effectiveness": "INEFFECTIVE"
+            },
+            {
+                "action": "WORKED_EXAMPLE",
+                "response_correct": true,
+                "effectiveness": "POSITIVE_RESPONSE"
+            }
+        ]
+    }
+}

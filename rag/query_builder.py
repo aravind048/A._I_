@@ -1,6 +1,7 @@
 def build_retrieval_query(
     concept,
     error_pattern,
+    question,
     pedagogical_action
 ):
     error_description = {
@@ -26,7 +27,8 @@ def build_retrieval_query(
 
     query = (
         f"Python {concept}. "
-        f"{error_text}. "
+        f"Learner issue: {error_text}. "
+        f"Question context: {question.strip()}. "
         f"Provide {action_phrase}."
     )
 
