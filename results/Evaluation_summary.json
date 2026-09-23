@@ -1,0 +1,51 @@
+{
+  "evaluation": "Day 4 ACMF Evaluation",
+  "experiments": [
+    {
+      "id": "D1",
+      "name": "Decision Sensitivity",
+      "purpose": "Test whether the pedagogical decision engine responds to different learner states.",
+      "key_result": "Different learner states produced different pedagogical actions.",
+      "demonstrates": "State-dependent decision behavior.",
+      "does_not_demonstrate": "That any particular pedagogical action produces better learning."
+    },
+    {
+      "id": "D2",
+      "name": "RAG Retrieval",
+      "purpose": "Test whether learner-specific queries retrieve concept-relevant educational knowledge.",
+      "key_result": "11 of 12 top-3 retrieved chunks belonged to the requested concept.",
+      "demonstrates": "Functional concept-relevant retrieval for the tested queries.",
+      "does_not_demonstrate": "Formal retrieval accuracy, because no human relevance ground-truth labels were used."
+    },
+    {
+      "id": "D3",
+      "name": "LLM Intervention Consistency",
+      "purpose": "Test whether generated interventions follow the selected pedagogical action.",
+      "key_result": "Action-specific prompt constraints improved alignment between the selected pedagogical action and the generated intervention in the controlled test.",
+      "demonstrates": "The LLM can be constrained to follow the selected pedagogical strategy.",
+      "does_not_demonstrate": "Improved learner outcomes."
+    },
+    {
+      "id": "D4",
+      "name": "Baseline Comparison",
+      "purpose": "Compare ACMF state-dependent decisions with a fixed EXPLANATION baseline.",
+      "key_result": "Baseline produced 1 unique action; ACMF produced 4 unique actions and differed from baseline in 3 of 4 cases.",
+      "demonstrates": "State-dependent adaptive behavior relative to a fixed strategy.",
+      "does_not_demonstrate": "Superior educational or learning outcomes."
+    }
+  ],
+  "overall_interpretation": {
+    "validated": [
+      "State-dependent pedagogical decision behavior",
+      "Concept-relevant RAG retrieval in the tested cases",
+      "Action-constrained LLM intervention generation",
+      "Adaptive action diversity relative to a fixed baseline"
+    ],
+    "not_yet_validated": [
+      "Causal learning improvement",
+      "General educational effectiveness",
+      "Statistical superiority over a baseline",
+      "Generalization to a large learner population"
+    ]
+  }
+}

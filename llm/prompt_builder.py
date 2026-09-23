@@ -3,10 +3,41 @@ def build_intervention_prompt(
     pedagogical_action,
     retrieved_chunks
 ):
-
     knowledge = "\n\n".join(
         chunk["content"]
         for chunk in retrieved_chunks
+    )
+
+    action_instructions = {
+        "EXPLANATION": """
+Explain the concept clearly and directly.
+The learner should understand why the behavior occurs.
+You may use examples when helpful.
+""",
+
+        "HINT": """
+Give only a short guiding hint.
+Do NOT provide the final answer.
+Do NOT fully explain the misconception.
+Guide the learner toward the next reasoning step.
+""",
+
+        "WORKED_EXAMPLE": """
+Provide a step-by-step worked example.
+Show the intermediate reasoning and the resulting outcome.
+""",
+
+        "CHALLENGE": """
+Give the learner a problem or question to solve.
+Do NOT provide the solution or final answer.
+Do NOT solve the challenge for the learner.
+The learner should perform the reasoning themselves.
+"""
+    }
+
+    selected_instruction = action_instructions.get(
+        pedagogical_action,
+        "Follow the selected pedagogical action."
     )
 
     prompt = f"""
@@ -21,14 +52,17 @@ Repeated error: {learner_state["repeated_error"]}
 Pedagogical action:
 {pedagogical_action}
 
+Action-specific instructions:
+{selected_instruction}
+
 Retrieved educational knowledge:
 {knowledge}
 
-Instructions:
-- Follow the selected pedagogical action.
+General instructions:
 - Address the learner's specific misconception.
-- Use the retrieved knowledge as the basis for the explanation.
-- Do not change the selected pedagogical action.
+- Use the retrieved knowledge as the basis for your response.
+- Follow the selected pedagogical action exactly.
+- Do not substitute another pedagogical action.
 - Use simple language appropriate for a beginner.
 """
 
