@@ -19,12 +19,12 @@ def run_experiment():
     )
 
     question = """
-a = [10, 20]
-b = a
-b.append(30)
+        a = [10, 20]
+        b = a
+        b.append(30)
 
-print(a)
-"""
+        print(a)
+    """
 
     expected_answer = "[10,20,30]"
 
@@ -63,7 +63,7 @@ print(a)
         )
 
         previous_effectiveness = (
-            learner.get_last_intervention_effectiveness()
+            learner.get_last_intervention_effectiveness(concept)
         )
 
         mastery_before = learner_state["mastery"]
@@ -92,6 +92,7 @@ print(a)
         query = build_retrieval_query(
             concept=concept,
             error_pattern=error_pattern,
+            question=question,
             pedagogical_action=action
         )
 
@@ -174,8 +175,8 @@ print(a)
         )
 
         learner.record_intervention(
+            concept=concept,
             action=action,
-            response_correct=correct,
             effectiveness=effectiveness
         )
 

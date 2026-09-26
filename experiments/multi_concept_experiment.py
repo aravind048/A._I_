@@ -125,7 +125,7 @@ def run_experiment():
             )
 
             previous_effectiveness = (
-                learner.get_last_intervention_effectiveness()
+                learner.get_last_intervention_effectiveness(concept)
             )
 
             # ==================================
@@ -237,8 +237,8 @@ def run_experiment():
             )
 
             learner.record_intervention(
+                concept=concept,
                 action=action,
-                response_correct=correct,
                 effectiveness=effectiveness
             )
 

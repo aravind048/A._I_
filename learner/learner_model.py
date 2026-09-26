@@ -8,8 +8,11 @@ class LearnerModel:
 
         self.knowledge = {}
 
+        self.state_history = {}
+
         self.reasoning = {
-            "error_history": {}
+            "error_history": {},
+            "intervention_history": {}
         }
 
         self.behaviour = {
@@ -28,6 +31,7 @@ class LearnerModel:
 
     def record_response(self, correct):
         self.progress["questions_attempted"] += 1
+        self.behaviour["attempt_count"] += 1
 
         if correct:
             self.progress["questions_correct"] += 1
@@ -74,6 +78,33 @@ class LearnerModel:
             "repeated_error": error_count >= 2
         }
 
+    def record_intervention(
+        self,
+        concept,
+        action,
+        effectiveness
+    ):
+
+        if concept not in self.reasoning["intervention_history"]:
+            self.reasoning["intervention_history"][concept] = []
+
+        self.reasoning["intervention_history"][concept].append({
+            "action": action,
+            "effectiveness": effectiveness
+        })
+
+    def get_last_intervention_effectiveness(self, concept):
+
+        history = self.reasoning["intervention_history"].get(
+            concept,
+            []
+        )
+
+        if not history:
+            return None
+
+        return history[-1]["effectiveness"]
+
     def update_knowledge(self, concept, correct):
 
         current_mastery = self.knowledge.get(
@@ -88,33 +119,16 @@ class LearnerModel:
 
         self.knowledge[concept] = updated_mastery
 
-        return updated_mastery
+        if concept not in self.state_history:
+            self.state_history[concept] = []
 
-    def record_intervention(
-        self,
-        action,
-        response_correct,
-        effectiveness
-    ):
-        if "intervention_history" not in self.reasoning:
-            self.reasoning["intervention_history"] = []
-
-        self.reasoning["intervention_history"].append({
-            "action": action,
-            "response_correct": response_correct,
-            "effectiveness": effectiveness
+        self.state_history[concept].append({
+            "mastery_before": current_mastery,
+            "correct": correct,
+            "mastery_after": updated_mastery
         })
 
-    def get_last_intervention_effectiveness(self):
-        history = self.reasoning.get(
-            "intervention_history",
-            []
-        )
-
-        if not history:
-            return None
-
-        return history[-1]["effectiveness"]
+        return updated_mastery
 
     def record_evidence(
         self,
@@ -122,10 +136,9 @@ class LearnerModel:
         correct,
         error_pattern=None
     ):
-        # Record basic response information
+
         self.record_response(correct)
 
-        # Record the error only when the response is incorrect
         if not correct and error_pattern:
             self.record_error(
                 concept,

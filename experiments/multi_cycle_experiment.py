@@ -1,3 +1,4 @@
+import learner
 from learner.learner_model import LearnerModel
 from decision.decision_engine import choose_action
 
@@ -37,7 +38,7 @@ def run_experiment():
         )
 
         previous_effectiveness = (
-            learner.get_last_intervention_effectiveness()
+            learner.get_last_intervention_effectiveness(concept)
         )
 
         # ----------------------------------
@@ -93,8 +94,8 @@ def run_experiment():
         # ----------------------------------
 
         learner.record_intervention(
+            concept=concept,
             action=action,
-            response_correct=correct,
             effectiveness=effectiveness
         )
 
@@ -137,6 +138,9 @@ def run_experiment():
     print(
         learner.reasoning["intervention_history"]
     )
+
+    print("\nState history:")
+    print(learner.state_history)
 
 
 if __name__ == "__main__":
