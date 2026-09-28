@@ -18,8 +18,9 @@ inject_styles()
 if "engine" not in st.session_state:
     st.session_state.engine = ACMFDemoEngine()
 
-# Preserve the decision/intervention that was just completed so the UI
-# can continue displaying it after the engine advances to the next state.
+if "selected_topic" not in st.session_state:
+    st.session_state.selected_topic = st.session_state.engine.CONCEPT
+
 if "last_completed_action" not in st.session_state:
     st.session_state.last_completed_action = None
 
@@ -54,8 +55,24 @@ st.markdown(
 with st.sidebar:
     st.markdown("### 🧭 Demo Controls")
 
-    if st.button("↻ Reset Experiment", use_container_width=True):
-        st.session_state.engine = ACMFDemoEngine()
+    selected_topic = st.selectbox(
+        "Choose a learning topic",
+        options=engine.available_topics,
+        index=engine.available_topics.index(st.session_state.selected_topic),
+        help="Choose one of the topics currently supported by the ACMF question bank.",
+    )
+
+    if selected_topic != st.session_state.selected_topic:
+        st.session_state.selected_topic = selected_topic
+        st.session_state.engine = ACMFDemoEngine(selected_topic)
+        st.session_state.last_completed_action = None
+        st.session_state.last_completed_intervention = None
+        st.session_state.last_completed_cycle = None
+        st.session_state.pop("last_evaluated_answer", None)
+        st.rerun()
+
+    if st.button("↻ Reset Current Topic", use_container_width=True):
+        st.session_state.engine.reset(selected_topic)
         st.session_state.last_completed_action = None
         st.session_state.last_completed_intervention = None
         st.session_state.last_completed_cycle = None
@@ -63,8 +80,8 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
-    st.markdown("**Demo scenario**")
-    st.caption("Concept: Python references")
+    st.markdown("**Current topic**")
+    st.caption(selected_topic.title())
 
     st.markdown("**Cycles completed**")
     st.caption(f"{len(engine.history)} / 3")
@@ -75,7 +92,7 @@ with st.sidebar:
     ]
 
     if observed_errors:
-        st.caption("Reference aliasing misunderstanding")
+        st.caption(engine.ERROR_PATTERN)
     else:
         st.caption("Not observed yet")
 
@@ -122,8 +139,8 @@ with c1:
     st.markdown(
         f"""
         <div class="state-card">
-            <div class="state-label">Mastery</div>
-            <div class="state-value">{state['mastery']:.4f}</div>
+            <div class="state-label">Topic</div>
+            <div class="state-value state-value-small">{selected_topic.title()}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -133,8 +150,8 @@ with c2:
     st.markdown(
         f"""
         <div class="state-card">
-            <div class="state-label">Error Count</div>
-            <div class="state-value">{state['error_count']}</div>
+            <div class="state-label">Mastery</div>
+            <div class="state-value">{state['mastery']:.4f}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -204,9 +221,6 @@ for col, (step, description) in zip(cols, pipeline):
 # -----------------------------
 # Decision / intervention area
 # -----------------------------
-# Current cycle: show the active decision while the learner response is pending.
-# Completed cycle: keep the latest decision/intervention visible instead of
-# leaving large empty panels.
 if engine.current_action:
     decision_title = "### 🎯 Current Pedagogical Decision"
     decision_action = engine.current_action
@@ -246,18 +260,13 @@ st.markdown(decision_title)
 
 left, right = st.columns([0.95, 1.05], gap="large")
 
-# -----------------------------
-# Decision panel
-# -----------------------------
 with left:
     with st.container(border=True):
-
         if decision_action:
             st.markdown(
                 f'<div class="decision-badge">{decision_action}</div>',
                 unsafe_allow_html=True,
             )
-
             st.write(decision_note)
 
             if decision_status == "completed" and engine.history:
@@ -270,7 +279,6 @@ with left:
                         <span>Cycle outcome</span>
                         <strong>{result_text}</strong>
                     </div>
-
                     <div class="history-row">
                         <span>Effectiveness</span>
                         <strong>{latest["effectiveness"]}</strong>
@@ -278,33 +286,26 @@ with left:
                     """,
                     unsafe_allow_html=True,
                 )
-
         else:
             st.info(
                 "Run the next cycle to let the decision engine select an action."
             )
 
-
-# -----------------------------
-# Intervention panel
-# -----------------------------
 with right:
     with st.container(border=True):
-
         st.markdown("**Intervention**")
 
         if decision_intervention:
             st.markdown(decision_intervention)
         else:
-            st.caption(
-                "The generated intervention will appear here."
-            )
+            st.caption("The generated intervention will appear here.")
 
 # -----------------------------
 # Learner interaction
 # -----------------------------
 st.markdown("### ✍️ Learner Interaction")
 
+st.markdown(f"**Topic:** {selected_topic.title()}")
 st.code(
     engine.QUESTION,
     language="python",
@@ -317,15 +318,17 @@ answer = st.text_input(
     value="",
     placeholder="Enter your answer...",
     disabled=not answer_enabled,
-    key=f"learner_answer_cycle_{engine.current_cycle}"
+    key=f"learner_answer_cycle_{engine.current_cycle}",
 )
 
 if not answer_enabled:
     st.caption(
-        "Run the next ACMF cycle first. The intervention will then be generated for the learner.")
+        "Run the next ACMF cycle first. The intervention will then be generated for the learner."
+    )
 else:
     st.caption(
-        "Enter the learner's response, then evaluate it to complete this cycle.")
+        "Enter the learner's response, then evaluate it to complete this cycle."
+    )
 
 b1, b2 = st.columns([1, 1])
 
@@ -360,8 +363,6 @@ with b2:
         disabled=not answer_enabled,
     ):
         try:
-            # Capture the decision/intervention before the engine clears its
-            # current-cycle state during evaluation.
             st.session_state.last_completed_action = engine.current_action
             st.session_state.last_completed_intervention = engine.current_intervention
             st.session_state.last_completed_cycle = engine.current_cycle
@@ -386,6 +387,10 @@ if engine.history:
         <div class="history-card {result_class}">
             <div>
                 <strong>Latest completed cycle • Cycle {latest['cycle']}</strong>
+            </div>
+            <div class="history-row">
+                <span>Question</span>
+                <strong>{latest['question_id']}</strong>
             </div>
             <div class="history-row">
                 <span>Learner response</span>
@@ -419,6 +424,10 @@ if engine.history:
                 <div>
                     <strong>Cycle {item['cycle']}</strong>
                     <span class="history-action">{item['action']}</span>
+                </div>
+                <div class="history-row">
+                    <span>Question</span>
+                    <strong>{item['question_id']}</strong>
                 </div>
                 <div class="history-row">
                     <span>Mastery</span>
