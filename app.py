@@ -38,7 +38,7 @@ engine = st.session_state.engine
 st.markdown(
     """
     <div class="hero">
-        <div class="hero-kicker">M.Tech Case Study • Proof-of-Concept</div>
+        <div class="hero-kicker">M.TECH CASE STUDY • PROOF-OF-CONCEPT</div>
         <div class="hero-title">Adaptive Cognitive Mentorship Framework</div>
         <div class="hero-subtitle">
             A visual demonstration of learner-state tracking, adaptive pedagogical
@@ -55,28 +55,32 @@ st.markdown(
 with st.sidebar:
     st.markdown("### 🧭 Demo Controls")
 
+    # Once a learner starts Cycle 1, changing the topic would invalidate the
+    # current learner state and intervention. Keep the topic fixed for the run.
+    topic_locked = bool(engine.history or engine.current_action)
+
     selected_topic = st.selectbox(
         "Choose a learning topic",
         options=engine.available_topics,
         index=engine.available_topics.index(st.session_state.selected_topic),
-        help="Choose one of the topics currently supported by the ACMF question bank.",
+        help="Choose a topic before starting the learner session.",
+        disabled=topic_locked,
     )
 
-    if selected_topic != st.session_state.selected_topic:
+    if selected_topic != st.session_state.selected_topic and not topic_locked:
         st.session_state.selected_topic = selected_topic
         st.session_state.engine = ACMFDemoEngine(selected_topic)
         st.session_state.last_completed_action = None
         st.session_state.last_completed_intervention = None
         st.session_state.last_completed_cycle = None
-        st.session_state.pop("last_evaluated_answer", None)
         st.rerun()
 
     if st.button("↻ Reset Current Topic", use_container_width=True):
-        st.session_state.engine.reset(selected_topic)
+        st.session_state.engine = ACMFDemoEngine(selected_topic)
+        st.session_state.selected_topic = selected_topic
         st.session_state.last_completed_action = None
         st.session_state.last_completed_intervention = None
         st.session_state.last_completed_cycle = None
-        st.session_state.pop("last_evaluated_answer", None)
         st.rerun()
 
     st.markdown("---")
@@ -87,19 +91,16 @@ with st.sidebar:
     st.caption(f"{len(engine.history)} / 3")
 
     st.markdown("**Error evidence**")
-    observed_errors = [
-        item for item in engine.history if not item["correct"]
-    ]
-
-    if observed_errors:
-        st.caption(engine.ERROR_PATTERN)
-    else:
-        st.caption("Not observed yet")
+    error_count = engine.get_display_state()["error_count"]
+    st.caption(str(error_count))
 
     if engine.history:
         latest = engine.history[-1]
         st.markdown("**Latest response**")
         st.caption("Correct" if latest["correct"] else "Incorrect")
+
+    if topic_locked:
+        st.info("Topic is locked for the current learner session.")
 
     st.markdown("---")
     st.caption("The UI is a demonstration layer over the ACMF pipeline.")
@@ -133,14 +134,15 @@ st.caption(
     "This state is maintained by the ACMF learner model."
 )
 
+# Topic is intentionally omitted here because it is already shown in the sidebar.
 c1, c2, c3, c4 = st.columns([1, 1, 1, 1.15])
 
 with c1:
     st.markdown(
         f"""
         <div class="state-card">
-            <div class="state-label">Topic</div>
-            <div class="state-value state-value-small">{selected_topic.title()}</div>
+            <div class="state-label">Mastery</div>
+            <div class="state-value">{state['mastery']:.4f}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -150,8 +152,8 @@ with c2:
     st.markdown(
         f"""
         <div class="state-card">
-            <div class="state-label">Mastery</div>
-            <div class="state-value">{state['mastery']:.4f}</div>
+            <div class="state-label">Error Count</div>
+            <div class="state-value">{state['error_count']}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -305,11 +307,16 @@ with right:
 # -----------------------------
 st.markdown("### ✍️ Learner Interaction")
 
-st.markdown(f"**Topic:** {selected_topic.title()}")
-st.code(
-    engine.QUESTION,
-    language="python",
-)
+if engine.current_action and engine.current_question:
+    st.caption(
+        "Answer the assessment question below. The intervention above is generated for this same question."
+    )
+    st.code(
+        engine.QUESTION,
+        language="python",
+    )
+else:
+    st.caption("Run the next ACMF cycle to receive the next assessment question.")
 
 answer_enabled = bool(engine.current_action)
 
@@ -368,8 +375,6 @@ with b2:
             st.session_state.last_completed_cycle = engine.current_cycle
 
             engine.evaluate_answer(answer)
-
-            st.session_state["last_evaluated_answer"] = answer
             st.rerun()
         except Exception as exc:
             st.error(f"Evaluation failed: {exc}")
