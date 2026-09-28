@@ -11,24 +11,19 @@ def build_intervention_prompt(
 
     action_instructions = {
         "EXPLANATION": """
-Explain the concept clearly and directly.
-Use the current assessment question as the learner's working context.
-The learner should understand why the behavior occurs.
-You may use examples when helpful.
+Explain the concept clearly and directly using the current assessment question.
 Do not introduce an unrelated problem.
+Keep the intervention concise and beginner-friendly.
 """,
 
         "HINT": """
 Give only a short guiding hint for the current assessment question.
 Do NOT provide the final answer.
-Do NOT fully explain the misconception.
-Guide the learner toward the next reasoning step.
 Do not introduce an unrelated problem.
 """,
 
         "WORKED_EXAMPLE": """
-Provide a step-by-step worked example related to the current assessment question.
-Show the intermediate reasoning and the resulting outcome.
+Provide a concise step-by-step worked example related to the current assessment question.
 Do not introduce an unrelated problem.
 """,
 
@@ -36,8 +31,7 @@ Do not introduce an unrelated problem.
 Turn the current assessment question into a concise challenge for the learner.
 Do NOT create a different question or a new scenario.
 Do NOT provide the solution or final answer.
-Do NOT solve the challenge for the learner.
-The learner should perform the reasoning themselves using the assessment question shown below.
+The learner must reason about the assessment question shown below.
 """
     }
 
@@ -72,8 +66,8 @@ General instructions:
 - Use the retrieved knowledge as the basis for your response.
 - Follow the selected pedagogical action exactly.
 - Keep the intervention consistent with the current assessment question.
-- Do not substitute another pedagogical action.
 - Use simple language appropriate for a beginner.
+- Keep the response concise; target 60-100 words.
 """
 
     return prompt.strip()
@@ -84,8 +78,7 @@ if __name__ == "__main__":
     learner_state = {
         "concept": "references",
         "mastery": 0.35,
-        "error_pattern":
-            "reference_aliasing_misunderstanding",
+        "error_pattern": "reference_aliasing_misunderstanding",
         "repeated_error": True
     }
 
@@ -97,27 +90,9 @@ y.append(4)
 print(x)"""
 
     retrieved_chunks = [
-        {
-            "content": (
-                "When we write x = [1, 2, 3] "
-                "and y = x, both variables refer "
-                "to the same list object."
-            )
-        },
-        {
-            "content": (
-                "A common misconception is that "
-                "y = x creates an independent copy "
-                "of the list. It does not."
-            )
-        },
-        {
-            "content": (
-                "If x = [1, 2, 3], y = x, and "
-                "y.append(4), printing x produces "
-                "[1, 2, 3, 4]."
-            )
-        }
+        {"content": "When y = x, both variables refer to the same list object."},
+        {"content": "A common misconception is that y = x creates an independent copy."},
+        {"content": "If y.append(4), the change is visible through x because both refer to the same object."}
     ]
 
     prompt = build_intervention_prompt(
