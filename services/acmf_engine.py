@@ -145,7 +145,7 @@ class ACMFDemoEngine:
         self.current_cycle += 1
 
         # Cycle N uses the Nth question for the selected topic. The same
-        # question is also supplied to the intervention prompt.
+        # question is supplied to the intervention prompt.
         question_index = min(
             self.current_cycle - 1,
             len(self.topic_questions) - 1,
@@ -193,11 +193,11 @@ class ACMFDemoEngine:
             pedagogical_action=self.current_action,
         )
 
-        self.current_chunks = retrieve(self.current_query, top_k=3)
+        # Two retrieved chunks are sufficient for the compact UI intervention
+        # and reduce prompt size for the local LLM demonstration.
+        self.current_chunks = retrieve(self.current_query, top_k=2)
         self.pipeline_status["RETRIEVE"] = "done"
 
-        # Critical consistency fix: the LLM receives the exact assessment
-        # question that is displayed in Learner Interaction.
         self.current_prompt = build_intervention_prompt(
             learner_state=learner_state,
             pedagogical_action=self.current_action,
