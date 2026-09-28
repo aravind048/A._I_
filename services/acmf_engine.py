@@ -11,9 +11,6 @@ from rag.query_builder import build_retrieval_query
 from decision.decision_engine import choose_action
 from learner.learner_model import LearnerModel
 
-# ------------------------------------------------------------
-# Make the ACMF project root importable.
-# ------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 if str(PROJECT_ROOT) not in sys.path:
@@ -21,16 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 
 class ACMFDemoEngine:
-    """
-    UI-facing orchestration layer.
-
-    Important:
-    This class does NOT replace ACMF components.
-    It only coordinates the existing components for the Streamlit demo.
-
-    The UI supports controlled topic selection using the existing question
-    bank. This is a demonstration feature, not a research experiment.
-    """
+    """UI-facing orchestration layer for the ACMF demonstration."""
 
     QUESTIONS_PATH = PROJECT_ROOT / "experiments" / "questions.json"
     TOPIC_ERROR_PATTERNS = {
@@ -77,10 +65,7 @@ class ACMFDemoEngine:
         self.ERROR_PATTERN = self.TOPIC_ERROR_PATTERNS[self.CONCEPT]
 
         self.learner = LearnerModel("L001")
-        self.learner.initialize_concept(
-            self.CONCEPT,
-            mastery=0.35,
-        )
+        self.learner.initialize_concept(self.CONCEPT, mastery=0.35)
 
         self.current_cycle = 0
         self.current_action = None
@@ -107,7 +92,6 @@ class ACMFDemoEngine:
         }
 
     def set_topic(self, concept):
-        """Select one of the topics supported by the existing question bank."""
         if not self.available_topics:
             raise RuntimeError("No ACMF topics are available.")
 
@@ -120,22 +104,18 @@ class ACMFDemoEngine:
         self.CONCEPT = concept
 
     def reset(self, concept=None):
-        """Reset the demo session, optionally switching to another topic."""
         if concept is not None:
             self.set_topic(concept)
-
         self._initialize_runtime()
 
     @property
     def QUESTION(self):
-        """Return the question for the current cycle/topic."""
         if self.current_question:
             return self.current_question["question"]
         return self.topic_questions[0]["question"]
 
     @property
     def EXPECTED_ANSWER(self):
-        """Return the expected answer for the current cycle/topic."""
         if self.current_question:
             return self.current_expected_answer
         return self.topic_questions[0]["expected_answer"]
@@ -151,30 +131,11 @@ class ACMFDemoEngine:
             "error_count": learner_state["error_count"],
             "repeated_error": learner_state["repeated_error"],
             "previous_effectiveness": (
-                self.learner.get_last_intervention_effectiveness(
-                    self.CONCEPT
-                )
+                self.learner.get_last_intervention_effectiveness(self.CONCEPT)
             ),
         }
 
     def prepare_next_cycle(self):
-        """
-        Runs the ACMF stages up to intervention generation.
-
-        Flow:
-            learner state
-                ↓
-            decision engine
-                ↓
-            retrieval query
-                ↓
-            RAG retrieval
-                ↓
-            prompt
-                ↓
-            LLM intervention
-        """
-
         if self.current_cycle >= 3:
             raise RuntimeError(
                 "The controlled three-cycle demonstration is complete. "
@@ -183,9 +144,12 @@ class ACMFDemoEngine:
 
         self.current_cycle += 1
 
-        # Use the existing question bank. Cycle 1/2/3 maps to the first,
-        # second, and third question for the selected topic.
-        question_index = min(self.current_cycle - 1, len(self.topic_questions) - 1)
+        # Cycle N uses the Nth question for the selected topic. The same
+        # question is also supplied to the intervention prompt.
+        question_index = min(
+            self.current_cycle - 1,
+            len(self.topic_questions) - 1,
+        )
         self.current_question = self.topic_questions[question_index]
         self.current_expected_answer = self.current_question["expected_answer"]
 
@@ -198,26 +162,20 @@ class ACMFDemoEngine:
             "UPDATE": "pending",
         }
 
-        # 1. UNDERSTAND
         learner_state = self.learner.get_state(
             self.CONCEPT,
             self.ERROR_PATTERN,
         )
-
         previous_effectiveness = (
-            self.learner.get_last_intervention_effectiveness(
-                self.CONCEPT
-            )
+            self.learner.get_last_intervention_effectiveness(self.CONCEPT)
         )
 
         self.pending_learner_state = learner_state
         self.pending_previous_effectiveness = previous_effectiveness
         self.pipeline_status["UNDERSTAND"] = "done"
 
-        # 2. DECIDE
-        # The current prototype treats the selected concept as the learning
-        # context. A future version can replace this with automated error
-        # classification from the learner response.
+        # Controlled prototype behaviour: the selected topic supplies the
+        # learning context; error classification is not inferred from UI text.
         conceptual_error = True
 
         self.current_action = choose_action(
@@ -228,7 +186,6 @@ class ACMFDemoEngine:
         )
         self.pipeline_status["DECIDE"] = "done"
 
-        # 3. BUILD RETRIEVAL QUERY
         self.current_query = build_retrieval_query(
             concept=self.CONCEPT,
             error_pattern=self.ERROR_PATTERN,
@@ -236,44 +193,22 @@ class ACMFDemoEngine:
             pedagogical_action=self.current_action,
         )
 
-        # 4. RETRIEVE
-        self.current_chunks = retrieve(
-            self.current_query,
-            top_k=3,
-        )
+        self.current_chunks = retrieve(self.current_query, top_k=3)
         self.pipeline_status["RETRIEVE"] = "done"
 
-        # 5. BUILD PROMPT
+        # Critical consistency fix: the LLM receives the exact assessment
+        # question that is displayed in Learner Interaction.
         self.current_prompt = build_intervention_prompt(
             learner_state=learner_state,
             pedagogical_action=self.current_action,
             retrieved_chunks=self.current_chunks,
+            question=self.QUESTION,
         )
 
-        # 6. GENERATE
-        self.current_intervention = generate_intervention(
-            self.current_prompt
-        )
+        self.current_intervention = generate_intervention(self.current_prompt)
         self.pipeline_status["GENERATE"] = "done"
 
     def evaluate_answer(self, user_answer):
-        """
-        Completes the cycle after the learner submits an answer.
-
-        Flow:
-            learner answer
-                ↓
-            correctness
-                ↓
-            effectiveness
-                ↓
-            learner evidence
-                ↓
-            mastery update
-                ↓
-            intervention history
-        """
-
         if not self.current_action:
             raise RuntimeError(
                 "Run the next ACMF cycle before evaluating an answer."
@@ -287,7 +222,6 @@ class ACMFDemoEngine:
             self.current_expected_answer,
         )
 
-        # 7. EVALUATE INTERVENTION
         effectiveness = evaluate_intervention(
             follow_up_correct=correct,
             explanation_provided=False,
@@ -295,22 +229,13 @@ class ACMFDemoEngine:
         )
         self.pipeline_status["EVALUATE"] = "done"
 
-        # 8. RECORD EVIDENCE
-        if correct:
-            self.learner.record_evidence(
-                concept=self.CONCEPT,
-                correct=True,
-            )
-        else:
-            self.learner.record_evidence(
-                concept=self.CONCEPT,
-                correct=False,
-                error_pattern=self.ERROR_PATTERN,
-            )
+        self.learner.record_evidence(
+            concept=self.CONCEPT,
+            correct=correct,
+            error_pattern=None if correct else self.ERROR_PATTERN,
+        )
 
-        # 9. UPDATE LEARNER MODEL
         mastery_before = self.pending_learner_state["mastery"]
-
         mastery_after = self.learner.update_knowledge(
             self.CONCEPT,
             correct,
@@ -344,8 +269,6 @@ class ACMFDemoEngine:
         self.last_action = self.current_action
         self.last_intervention = self.current_intervention
 
-        # Clear pending cycle state. The completed decision/intervention is
-        # preserved in history and by the Streamlit session state.
         self.current_action = None
         self.current_intervention = None
         self.current_query = None
