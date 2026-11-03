@@ -166,9 +166,16 @@ if st.button("Run analysis", type="primary", disabled=not question.strip()):
                         for source in sources:
                             page = source.get("page")
                             page_label = f" · Page {page}" if page else ""
+                            distance = source.get("retrieval_distance")
+                            distance_label = (
+                                f" · Retrieval distance: {distance}"
+                                if distance is not None
+                                else ""
+                            )
                             st.markdown(
                                 f"- **{source.get('file', 'Unknown source')}**"
                                 f"{page_label} · Chunk {source.get('chunk_id', 'Unknown')}"
+                                f"{distance_label}"
                             )
                     else:
                         st.write("No source metadata was returned.")
