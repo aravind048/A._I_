@@ -1,52 +1,28 @@
+
 import logging
 import os
 
 from dotenv import load_dotenv
-from huggingface_hub import InferenceClient
-from langchain_core.prompt_values import ChatPromptValue
-from langchain_core.runnables import RunnableLambda
-
-from config import HF_MODEL, HF_PROVIDER, HF_TOKEN
+from langchain_ollama import ChatOllama
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-if not HF_TOKEN:
-    logger.warning("HF_TOKEN environment variable is not set. Hugging Face API calls will fail.")
+# Local Ollama configuration
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:4b")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
-client = InferenceClient(
-    model=HF_MODEL,
-    provider=HF_PROVIDER,
-    token=HF_TOKEN,
+logger.info(
+    "Initializing local LLM: model=%s, base_url=%s",
+    OLLAMA_MODEL,
+    OLLAMA_BASE_URL,
 )
 
-
-def hf_generate(prompt) -> str:
-    """Generate a response using the configured Hugging Face provider.
-
-    Input:
-        prompt: str or LangChain ChatPromptValue
-
-    Output:
-        Generated response as a string
-    """
-    if isinstance(prompt, ChatPromptValue):
-        prompt = prompt.to_string()
-
-    messages = [{"role": "user", "content": prompt}]
-
-    try:
-        logger.info("Calling Hugging Face model=%s provider=%s", HF_MODEL, HF_PROVIDER)
-        response = client.chat.completions.create(
-            messages=messages,
-            max_tokens=700,
-            temperature=0.2,
-        )
-        return response.choices[0].message.content
-    except Exception:
-        logger.exception("Hugging Face API request failed")
-        raise
-
-
-hf_llm = RunnableLambda(hf_generate)
+# LangChain-compatible local chat model
+hf_llm = ChatOllama(
+    model=OLLAMA_MODEL,
+    base_url=OLLAMA_BASE_URL,
+    temperature=0.2,
+    num_predict=700,
+)
