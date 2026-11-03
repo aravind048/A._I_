@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -30,7 +31,6 @@ class VectorStoreService:
         """Load the persisted knowledge base, or return None if absent."""
         index_file = self.index_path / "index.faiss"
         metadata_file = self.index_path / "index.pkl"
-
         if not index_file.exists() or not metadata_file.exists():
             return None
 
@@ -39,6 +39,11 @@ class VectorStoreService:
             self.embeddings,
             allow_dangerous_deserialization=True,
         )
+
+    def clear(self):
+        """Delete the persisted FAISS index."""
+        if self.index_path.exists():
+            shutil.rmtree(self.index_path)
 
     def _save(self, vectorstore):
         self.index_path.mkdir(parents=True, exist_ok=True)
