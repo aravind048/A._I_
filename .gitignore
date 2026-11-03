@@ -19,6 +19,7 @@ env/
 *.sqlite3
 data/uploads/
 data/vectorstore/
+data/knowledge_base/
 
 # Logs
 *.log
