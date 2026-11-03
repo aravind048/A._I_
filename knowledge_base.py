@@ -20,22 +20,25 @@ class KnowledgeBase:
         if not self.manifest_path.exists():
             return []
         try:
-            return json.loads(self.manifest_path.read_text(encoding="utf-8"))
+            data = json.loads(self.manifest_path.read_text(encoding="utf-8"))
+            return data if isinstance(data, list) else []
         except (json.JSONDecodeError, OSError):
             return []
 
     def _write_manifest(self, documents):
         self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        self.manifest_path.write_text(
-            json.dumps(documents, indent=2), encoding="utf-8"
-        )
+        self.manifest_path.write_text(json.dumps(documents, indent=2), encoding="utf-8")
 
-    def ingest(self, file_path: str):
-        """Split, index, and register one uploaded PDF."""
+    def ingest(self, file_path: str, display_name: str | None = None):
+        """Split, index, and register one PDF."""
         path = Path(file_path)
+        visible_name = display_name or path.name
         documents = load_and_split(str(path))
         if not documents:
             raise ValueError("The PDF contains no extractable text.")
+
+        for chunk in documents:
+            chunk.metadata["source_file"] = visible_name
 
         existing_store = self.vector_store.load()
         if existing_store is None:
@@ -46,7 +49,7 @@ class KnowledgeBase:
         registry = self._read_manifest()
         record = {
             "document_id": str(uuid4()),
-            "file": path.name,
+            "file": visible_name,
             "chunks": len(documents),
             "indexed_at": datetime.now(timezone.utc).isoformat(),
         }
@@ -55,17 +58,21 @@ class KnowledgeBase:
         return record
 
     def list_documents(self):
-        """Return registered documents and detect an unregistered legacy index."""
+        """Return registered documents and flag an unregistered legacy index."""
+        registry = self._read_manifest()
+        index_exists = (
+            (self.vector_store.index_path / "index.faiss").exists()
+            and (self.vector_store.index_path / "index.pkl").exists()
+        )
         return {
-            "documents": self._read_manifest(),
-            "legacy_index_present": (
-                self.vector_store.load() is not None
-                and not self._read_manifest()
-            ),
+            "documents": registry,
+            "legacy_index_present": index_exists and not registry,
+            "total_documents": len(registry),
+            "total_chunks": sum(item.get("chunks", 0) for item in registry),
         }
 
     def clear(self):
-        """Remove the local vector index, uploaded PDFs, and document registry."""
+        """Remove the vector index, uploaded PDFs, and document registry."""
         self.vector_store.clear()
         if self.upload_dir.exists():
             for path in self.upload_dir.iterdir():
@@ -74,6 +81,6 @@ class KnowledgeBase:
         if self.manifest_path.exists():
             self.manifest_path.unlink()
         return {"status": "Knowledge base cleared"}
-    
+
     def load(self):
         return self.vector_store.load()
